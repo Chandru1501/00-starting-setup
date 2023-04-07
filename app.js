@@ -2,10 +2,11 @@ const path = require('path');
 
 const express = require('express');
 const bodyParser = require('body-parser');
-const Sequelize = require('sequelize');
 const sequelize = require('./util/database');
-const products = require('./models/product');
+const Products = require('./models/product');
 const User = require('./models/user');
+const Cart = require('./models/cart');
+const CartItem = require('./models/cartItem');
 
 const errorController = require('./controllers/error');
 
@@ -35,8 +36,13 @@ app.use(shopRoutes);
 
 app.use(errorController.get404);
 
-products.belongsTo(User,{constraints : true , onDelete : 'CASCADE'});
-User.hasMany(products);
+Products.belongsTo(User,{constraints : true , onDelete : 'CASCADE'});
+User.hasMany(Products);
+User.hasOne(Cart);
+Cart.belongsTo(User);  // this is inverse (vice-versa) of User.haseOne(Cart)
+Cart.belongsToMany(Products, { through : CartItem });
+Products.belongsToMany(Cart, { through : CartItem })
+
 
 sequelize
 // .sync({force : true})
@@ -52,6 +58,15 @@ sequelize
   return user;
 })
 .then((user)=>{
+ Cart.findOne({where : {id:1}})
+ .then(cart=>{
+   if(!cart){
+    return user.createCart();
+   }
+   return cart;
+ })
+})
+.then(cart=>{
   app.listen(3000);
 })
-.catch(err => console.log(err))
+.catch(err => console.log(err));

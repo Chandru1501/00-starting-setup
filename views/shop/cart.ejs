@@ -4,17 +4,20 @@
     <body>
         <%- include('../includes/navigation.ejs') %>
         <main>
-          <% if(products.Products.length>0) { %>
-            <% products.Products.forEach(prod => { %>
-                <ul>
-        <form action="/delete-cart" method="POST">
-                <li><%=prod.title%> Quantity = <%=prod.qty%></li>
-                <input type="hidden" name="productId" value="<%=prod.id%>" >
-                <button type="submit" class="btn">Delete</button>
-            </ul>
-        </form>
+          <% if(products.length>0) { %>
+            <ul class="list-group">
+            <% products.forEach(prod => { %>
+                <li class="list-group-item">
+                    <%=prod.title%> 
+                    Quantity = <%=prod.cartItem.quantity%>                    
+                <form action="/delete-cart" method="POST">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <input type="hidden" name="productId" value="<%=prod.id%>" >
+                </form>
+            </li>
                 <% }) %> 
-            <h2>Total Cost in the Cart = <%= products.totalPrice %></h2>
+            </ul>
+            <!-- <h2>Total Cost in the Cart = <%= products.totalPrice %></h2> -->
         <% } else { %>
             <h2>No products in the Cart</h2>
             <% } %>
